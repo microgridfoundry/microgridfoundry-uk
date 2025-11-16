@@ -43,8 +43,9 @@ setInterval(() => {
 }, 5 * 60 * 1000); // Clean up every 5 minutes
 
 export const handler: Handlers = {
-  async POST(req) {
+  async POST(req, _ctx) {
     try {
+      console.log("Contact form handler called", { hasReq: !!req, hasHeaders: !!(req?.headers), reqType: typeof req });
       // Early check for environment access
       if (typeof Deno === "undefined" || !Deno.env) {
         console.error("Deno environment not available");
