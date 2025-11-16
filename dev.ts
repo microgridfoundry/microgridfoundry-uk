@@ -12,8 +12,8 @@ tailwind(builder);
 if (Deno.args.includes("build")) {
   await builder.build();
 } else {
-  await builder.listen(() => import("./main.ts"), { 
-    port, 
-    hostname: "0.0.0.0" 
+  await builder.listen(() => import("./main.ts"), {
+    port,
+    hostname: "0.0.0.0",
   });
 }

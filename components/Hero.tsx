@@ -10,17 +10,19 @@ export default function Hero() {
             Incubating community-owned microgrids across the South-West
           </p>
           <p className="text-lg text-gray-700 mb-10 max-w-2xl mx-auto">
-            We work with local communities who seek to own and operate local renewable energy systems with solar generation, battery storage, and smart distribution networks.
+            We work with local communities who seek to own and operate local
+            renewable energy systems with solar generation, battery storage, and
+            smart distribution networks.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <a 
-              href="#contact" 
+            <a
+              href="#contact"
               className="bg-blue-600 text-white px-8 py-4 rounded-lg text-lg font-semibold hover:bg-blue-700 transition duration-200"
             >
               Get Started
             </a>
-            <a 
-              href="#communities" 
+            <a
+              href="#communities"
               className="border-2 border-blue-600 text-blue-600 px-8 py-4 rounded-lg text-lg font-semibold hover:bg-blue-50 transition duration-200"
             >
               Our Communities
