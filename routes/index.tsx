@@ -1,5 +1,7 @@
-export const title = "Microgrid Foundry - Powering Community Energy Independence";
-export const description = "Clean, affordable energy systems owned and controlled by communities. Operating smart local grids across the South-West of the UK.";
+export const title =
+  "Microgrid Foundry - Powering Community Energy Independence";
+export const description =
+  "Clean, affordable energy systems owned and controlled by communities. Operating smart local grids across the South-West of the UK.";
 
 import Nav from "../components/Nav.tsx";
 import Footer from "../components/Footer.tsx";

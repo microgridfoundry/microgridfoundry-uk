@@ -14,7 +14,11 @@ app.use(async (ctx) => {
   console.log(`[${new Date().toISOString()}] ${ctx.req.method} ${ctx.req.url}`);
   const res = await ctx.next();
   const ms = Date.now() - start;
-  console.log(`[${new Date().toISOString()}] ${ctx.req.method} ${ctx.req.url} - ${res.status} ${ms}ms`);
+  console.log(
+    `[${
+      new Date().toISOString()
+    }] ${ctx.req.method} ${ctx.req.url} - ${res.status} ${ms}ms`,
+  );
   return res;
 });
 
@@ -28,6 +32,8 @@ app.fsRoutes();
 if (import.meta.main) {
   const port = parseInt(Deno.env.get("PORT") || "8000");
   const hostname = "0.0.0.0";
-  console.log(`Starting Microgrid Foundry website on http://${hostname}:${port}`);
+  console.log(
+    `Starting Microgrid Foundry website on http://${hostname}:${port}`,
+  );
   await app.listen({ port, hostname });
 }

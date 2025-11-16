@@ -3,32 +3,44 @@
 ## Key Learnings from Deploying Fresh v2 with Docker
 
 ### Overview
+
 Fresh v2 introduces significant architectural changes compared to v1:
+
 - New Builder API for development
-- App-based architecture for main.ts  
+- App-based architecture for main.ts
 - JSR imports instead of deno.land/x
 - Simplified handler signatures
 - Updated head management
 - Required build step for production deployments
 
 ### Why Docker Over Buildpacks
-**Use Docker, not buildpacks.** While Fly.io supports buildpack auto-detection, buildpacks frequently fail due to availability and permission issues. Docker provides:
+
+**Use Docker, not buildpacks.** While Fly.io supports buildpack auto-detection,
+buildpacks frequently fail due to availability and permission issues. Docker
+provides:
+
 - Reliable, repeatable deployments
 - Full control over the environment
 - Consistent behavior between local and production
 - Better debugging when issues arise
 
 ### Migration Tool
+
 Fresh provides an official update tool to help migrate from v1.x to v2.0:
+
 ```bash
 deno run -A -r jsr:@fresh/update .
 ```
-This tool automatically updates import mappings, dev.ts/main.ts structure, and route file imports.
+
+This tool automatically updates import mappings, dev.ts/main.ts structure, and
+route file imports.
 
 ## Migration from Fresh v1 to v2
 
 ### Import Mapping Changes
+
 **Fresh v1.x:**
+
 ```json
 {
   "imports": {
@@ -40,6 +52,7 @@ This tool automatically updates import mappings, dev.ts/main.ts structure, and r
 ```
 
 **Fresh v2:**
+
 ```json
 {
   "imports": {
@@ -51,7 +64,9 @@ This tool automatically updates import mappings, dev.ts/main.ts structure, and r
 ```
 
 ### main.ts Structure Changes
+
 **Fresh v1.x:**
+
 ```typescript
 import { start } from "$fresh/server.ts";
 import manifest from "./fresh.gen.ts";
@@ -59,6 +74,7 @@ await start(manifest, config);
 ```
 
 **Fresh v2:**
+
 ```typescript
 import { App, staticFiles } from "fresh";
 export const app = new App();
@@ -69,9 +85,13 @@ app.fsRoutes();
 ## Critical Discoveries
 
 ### 1. Fresh v2 Production Requires a Build Step
-Unlike development mode, Fresh v2 in production cannot dynamically load routes using `app.fsRoutes()`. The framework needs to compile routes and assets into an optimized bundle.
+
+Unlike development mode, Fresh v2 in production cannot dynamically load routes
+using `app.fsRoutes()`. The framework needs to compile routes and assets into an
+optimized bundle.
 
 **Why this matters:**
+
 - `app.fsRoutes()` works in dev mode but returns 404s in production
 - Routes must be pre-compiled for production deployment
 - The build process generates optimized JavaScript files in `_fresh/`
@@ -80,6 +100,7 @@ Unlike development mode, Fresh v2 in production cannot dynamically load routes u
 ### 2. The Build Process
 
 Fresh v2 uses a `Builder` API that:
+
 - Compiles all routes and components
 - Generates `_fresh/server.js` (not `main.js`)
 - Creates optimized static assets
@@ -101,17 +122,20 @@ deno run -A dev.ts build
 Fresh v2's built output is designed for `deno serve`, not `deno run`:
 
 **Wrong approach:**
+
 ```dockerfile
 CMD ["run", "-A", "main.ts"]  # Works in dev, fails in production
 CMD ["run", "-A", "_fresh/server.js"]  # Gives warning about fetch handler
 ```
 
 **Correct approach:**
+
 ```dockerfile
 CMD ["serve", "-A", "--port=8000", "_fresh/server.js"]
 ```
 
-The built server exports a fetch handler: `export default { fetch }`, which `deno serve` expects.
+The built server exports a fetch handler: `export default { fetch }`, which
+`deno serve` expects.
 
 ### 4. Working Dockerfile Pattern
 
@@ -140,37 +164,47 @@ CMD ["serve", "-A", "--port=8000", "_fresh/server.js"]
 ## Common Pitfalls and Solutions
 
 ### Problem 1: Routes Return 404 in Docker
+
 **Cause:** `app.fsRoutes()` doesn't work in production without a build step.
 **Solution:** Always run `deno run -A dev.ts build` before serving.
 
 ### Problem 2: "Module not found" Errors
-**Cause:** Looking for wrong file names or not building first.
-**Solution:** The build creates `_fresh/server.js`, not `main.js`.
+
+**Cause:** Looking for wrong file names or not building first. **Solution:** The
+build creates `_fresh/server.js`, not `main.js`.
 
 ### Problem 3: "Expected a Response instance" Errors
+
 **Cause:** Trying to register Fresh routes manually without proper handling.
 **Solution:** Use the build system; don't try to manually wire routes.
 
-### Problem 4: Port Configuration Issues  
-**Cause:** Fresh v2 has different port configuration in dev vs production, and port mismatches between Docker and application.
+### Problem 4: Port Configuration Issues
+
+**Cause:** Fresh v2 has different port configuration in dev vs production, and
+port mismatches between Docker and application.
 
 **Common Issues:**
+
 - Docker exposes one port (e.g., 8000) but app listens on another
 - `deno serve` defaults to 8000 if not specified
 - Environment variables not being read correctly
 - Fly.io expects specific port configuration
 
-**Solution:** 
+**Solution:**
+
 - For development: Configure port in `dev.ts` with `Builder.listen()` options
-- For production: Always explicitly specify port with `--port=8000` flag in `deno serve`
+- For production: Always explicitly specify port with `--port=8000` flag in
+  `deno serve`
 - Ensure consistency across:
   - Dockerfile EXPOSE directive
-  - CMD port specification  
+  - CMD port specification
   - fly.toml internal_port setting
   - Environment variable PORT
-- Avoid configuring port in `main.ts` or `fresh.config.ts` as they're ignored in production
+- Avoid configuring port in `main.ts` or `fresh.config.ts` as they're ignored in
+  production
 
 **Correct Configuration:**
+
 ```dockerfile
 # Dockerfile
 ENV PORT=8000
@@ -188,15 +222,19 @@ CMD ["serve", "-A", "--port=8000", "_fresh/server.js"]
 ```
 
 ### Problem 5: Head Component Removed
-**Cause:** Fresh v2 removes the `<Head>` component.
-**Solution:** Use exported constants instead:
+
+**Cause:** Fresh v2 removes the `<Head>` component. **Solution:** Use exported
+constants instead:
+
 ```typescript
 // Fresh v1
 import { Head } from "$fresh/runtime.ts";
 export default function Page() {
   return (
     <>
-      <Head><title>My Page</title></Head>
+      <Head>
+        <title>My Page</title>
+      </Head>
       <div>Content</div>
     </>
   );
@@ -210,8 +248,9 @@ export default function Page() {
 ```
 
 ### Problem 6: API Handler Signature Changes
-**Cause:** Fresh v2 API handlers only accept one argument.
-**Solution:**
+
+**Cause:** Fresh v2 API handlers only accept one argument. **Solution:**
+
 ```typescript
 // Fresh v1
 export const handler = (req: Request, ctx: FreshContext): Response => {
@@ -225,8 +264,9 @@ export const handler = (req: Request): Response => {
 ```
 
 ### Problem 7: Route Import Path Changes
-**Cause:** Route files still using Fresh v1 import paths.
-**Solution:**
+
+**Cause:** Route files still using Fresh v1 import paths. **Solution:**
+
 ```typescript
 // Fresh v1
 import { PageProps } from "$fresh/server.ts";
@@ -238,16 +278,19 @@ import { PageProps } from "fresh";
 ## Development vs Production
 
 ### Development Mode
+
 ```typescript
 // dev.ts
 const builder = new Builder();
 await builder.listen(() => import("./main.ts"), { port, hostname });
 ```
+
 - Hot reloading
 - Dynamic route loading
 - Runs directly from source
 
 ### Production Mode
+
 ```bash
 # Build first
 deno run -A dev.ts build
@@ -255,6 +298,7 @@ deno run -A dev.ts build
 # Then serve
 deno serve -A --port=8000 _fresh/server.js
 ```
+
 - Pre-compiled routes
 - Optimized assets
 - No dynamic loading
@@ -270,12 +314,17 @@ app.use(async (ctx) => {
   console.log(`[${new Date().toISOString()}] ${ctx.req.method} ${ctx.req.url}`);
   const res = await ctx.next();
   const ms = Date.now() - start;
-  console.log(`[${new Date().toISOString()}] ${ctx.req.method} ${ctx.req.url} - ${res.status} ${ms}ms`);
+  console.log(
+    `[${
+      new Date().toISOString()
+    }] ${ctx.req.method} ${ctx.req.url} - ${res.status} ${ms}ms`,
+  );
   return res;
 });
 ```
 
-Note: Middleware signature changed from v1 - `next` is now `ctx.next()` and returns a Response.
+Note: Middleware signature changed from v1 - `next` is now `ctx.next()` and
+returns a Response.
 
 ## Docker Commands for Local Testing
 
@@ -296,9 +345,10 @@ docker stop mgf-test
 ## Migration Checklist
 
 When migrating from Fresh v1 to v2:
+
 - [ ] Update deno.json imports to Fresh v2 + npm packages
 - [ ] Convert dev.ts to use Builder API
-- [ ] Convert main.ts to use App pattern  
+- [ ] Convert main.ts to use App pattern
 - [ ] Update fresh.config.ts imports
 - [ ] Update all route file imports ($fresh/server.ts → fresh)
 - [ ] Replace Head components with exported title/description constants
@@ -313,8 +363,10 @@ When migrating from Fresh v1 to v2:
 
 ## Key Takeaways
 
-1. **Always build for production** - Fresh v2 requires compilation for production deployments
-2. **Use deno serve** - The built output is designed for `deno serve`, not `deno run`
+1. **Always build for production** - Fresh v2 requires compilation for
+   production deployments
+2. **Use deno serve** - The built output is designed for `deno serve`, not
+   `deno run`
 3. **Correct file paths** - Build outputs to `_fresh/server.js`, not `main.js`
 4. **Port configuration** - Use `--port` flag with `deno serve` in production
 5. **Middleware changes** - Fresh v2 has different middleware signatures than v1

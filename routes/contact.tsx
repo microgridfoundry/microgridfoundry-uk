@@ -2,7 +2,7 @@ import { PageProps } from "fresh";
 import Nav from "../components/Nav.tsx";
 import Footer from "../components/Footer.tsx";
 
-export default function ContactPage(props: PageProps) {
+export default function ContactPage(_props: PageProps) {
   return (
     <>
       <Nav />
@@ -11,12 +11,15 @@ export default function ContactPage(props: PageProps) {
         <section className="pt-24 pb-8">
           <div className="container mx-auto px-4">
             <div className="text-center max-w-4xl mx-auto">
-              <p className="text-red-600 font-semibold uppercase tracking-wider mb-4">GET IN TOUCH</p>
+              <p className="text-red-600 font-semibold uppercase tracking-wider mb-4">
+                GET IN TOUCH
+              </p>
               <h1 className="text-5xl font-bold text-gray-900 mb-6">
                 We'd love to hear from you
               </h1>
               <p className="text-xl text-gray-600">
-                If you are interested in finding out more we'd love to speak to you.
+                If you are interested in finding out more we'd love to speak to
+                you.
               </p>
             </div>
           </div>
@@ -38,22 +41,28 @@ export default function ContactPage(props: PageProps) {
                   referrerPolicy="no-referrer-when-downgrade"
                   title="Microgrid Foundry Location"
                   className="w-full h-full"
-                ></iframe>
+                >
+                </iframe>
               </div>
 
               {/* Contact Information and Form */}
               <div className="space-y-8">
                 {/* Address Section */}
                 <div className="bg-blue-50 rounded-lg p-6">
-                  <h2 className="text-2xl font-bold text-gray-900 mb-6">Head Office & Operations</h2>
+                  <h2 className="text-2xl font-bold text-gray-900 mb-6">
+                    Head Office & Operations
+                  </h2>
                   <p className="text-blue-600 text-lg">
-                    Unit 21a, Easton Business Centre, Felix Road, Easton, Bristol, BS5 0HE
+                    Unit 21a, Easton Business Centre, Felix Road, Easton,
+                    Bristol, BS5 0HE
                   </p>
                 </div>
 
                 {/* Contact Form */}
                 <div>
-                  <h3 className="text-2xl font-bold text-gray-900 mb-6">Contact us now</h3>
+                  <h3 className="text-2xl font-bold text-gray-900 mb-6">
+                    Contact us now
+                  </h3>
                   <form className="space-y-4">
                     <div>
                       <input
@@ -85,7 +94,8 @@ export default function ContactPage(props: PageProps) {
                         className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition resize-none"
                         placeholder="Enquiry"
                         required
-                      ></textarea>
+                      >
+                      </textarea>
                     </div>
 
                     <button
@@ -97,11 +107,21 @@ export default function ContactPage(props: PageProps) {
 
                     <p className="text-xs text-gray-500 mt-4">
                       This site is protected by reCAPTCHA and the Google{" "}
-                      <a href="https://policies.google.com/privacy" className="text-blue-600 hover:underline" target="_blank" rel="noopener noreferrer">
+                      <a
+                        href="https://policies.google.com/privacy"
+                        className="text-blue-600 hover:underline"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
                         Privacy Policy
                       </a>{" "}
                       and{" "}
-                      <a href="https://policies.google.com/terms" className="text-blue-600 hover:underline" target="_blank" rel="noopener noreferrer">
+                      <a
+                        href="https://policies.google.com/terms"
+                        className="text-blue-600 hover:underline"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
                         Terms of Service
                       </a>{" "}
                       apply.
