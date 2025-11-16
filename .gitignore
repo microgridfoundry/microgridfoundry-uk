@@ -1,0 +1,26 @@
+# Dependencies
+node_modules/
+deno.lock
+
+# Fresh build cache
+_fresh/
+
+# Coverage
+coverage/
+
+# Screenshots
+screenshots/
+.playwright-mcp/
+
+# Environment variables
+.env
+.env.local
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db

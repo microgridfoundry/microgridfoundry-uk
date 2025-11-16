@@ -1,0 +1,49 @@
+{
+  "lock": false,
+  "nodeModulesDir": "auto",
+  "tasks": {
+    "check": "deno fmt --check && deno lint && deno check **/*.ts && deno check **/*.tsx",
+    "cli": "echo \"import 'fresh/dev/cli.ts'\" | deno run -A -",
+    "manifest": "deno task cli manifest $(pwd)",
+    "dev": "deno run -A --watch=static/,routes/,components/,islands/ dev.ts",
+    "start": "deno serve -A _fresh/server.js",
+    "build": "deno run -A dev.ts build",
+    "preview": "deno run -A main.ts",
+    "update": "deno run -A -r jsr:@fresh/update .",
+    "deploy": "flyctl deploy",
+    "test": "deno test --allow-net --allow-read --allow-env --allow-write --allow-run --coverage=coverage",
+    "test:watch": "deno test --allow-net --allow-read --allow-env --allow-write --allow-run --watch",
+    "coverage": "deno coverage coverage"
+  },
+  "lint": { "rules": { "tags": ["fresh", "recommended"] } },
+  "exclude": ["**/_fresh/*", "**/coverage/*", "**/node_modules/*"],
+  "imports": {
+    "fresh": "jsr:@fresh/core@^2.0.0-alpha.58",
+    "preact": "npm:preact@^10.27.0",
+    "@preact/signals": "npm:@preact/signals@^2.2.1",
+    "tailwindcss": "npm:tailwindcss@^4.1.10",
+    "@fresh/plugin-tailwind": "jsr:@fresh/plugin-tailwind@^0.0.1-alpha.9",
+    "@tailwindcss/postcss": "npm:@tailwindcss/postcss@^4.1.10",
+    "postcss": "npm:postcss@^8.5.6",
+    "@std/dotenv": "jsr:@std/dotenv@^0.225.0",
+    "@std/http": "jsr:@std/http@^1.0.0"
+  },
+  "compilerOptions": {
+    "lib": [
+      "dom",
+      "dom.asynciterable", 
+      "dom.iterable",
+      "deno.ns"
+    ],
+    "jsx": "precompile",
+    "jsxImportSource": "preact",
+    "jsxPrecompileSkipElements": [
+      "a",
+      "img", 
+      "source",
+      "body",
+      "html",
+      "head"
+    ]
+  }
+}
