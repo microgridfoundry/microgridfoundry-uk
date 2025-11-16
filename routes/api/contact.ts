@@ -45,6 +45,37 @@ setInterval(() => {
 export const handler: Handlers = {
   async POST(req) {
     try {
+      // Early check for environment access
+      if (typeof Deno === "undefined" || !Deno.env) {
+        console.error("Deno environment not available");
+        return new Response(
+          JSON.stringify({
+            success: false,
+            error: "Server configuration error. Please contact the administrator.",
+          }),
+          {
+            status: 500,
+            headers: { "Content-Type": "application/json" },
+          }
+        );
+      }
+
+      // Check for Resend API key early
+      const resendApiKey = Deno.env.get("RESEND_API_KEY");
+      if (!resendApiKey || resendApiKey.trim() === "") {
+        console.error("RESEND_API_KEY environment variable is not set or is empty");
+        return new Response(
+          JSON.stringify({
+            success: false,
+            error: "Email service is not configured. Please set the RESEND_API_KEY environment variable. Visit /debug to check configuration.",
+          }),
+          {
+            status: 503,
+            headers: { "Content-Type": "application/json" },
+          }
+        );
+      }
+
       // Get client IP for rate limiting
       const ip = req.headers.get("x-forwarded-for")?.split(",")[0].trim() ||
         req.headers.get("x-real-ip") ||
@@ -124,14 +155,20 @@ export const handler: Handlers = {
         );
       }
 
-      // Check for Resend API key
-      const resendApiKey = Deno.env.get("RESEND_API_KEY");
-      if (!resendApiKey) {
-        console.error("RESEND_API_KEY environment variable is not set");
+      // Get recipient email (defaults to a fallback)
+      const toEmail = Deno.env.get("CONTACT_EMAIL") || "hello@microgridfoundry.co.uk";
+      const fromEmail = Deno.env.get("RESEND_FROM_EMAIL") || "onboarding@resend.dev";
+
+      // Initialize Resend with error handling
+      let resend;
+      try {
+        resend = new Resend(resendApiKey);
+      } catch (initError) {
+        console.error("Failed to initialize Resend:", initError);
         return new Response(
           JSON.stringify({
             success: false,
-            error: "Email service is not configured. Please contact the administrator.",
+            error: "Failed to initialize email service. Please check your RESEND_API_KEY is valid.",
           }),
           {
             status: 500,
@@ -140,15 +177,10 @@ export const handler: Handlers = {
         );
       }
 
-      // Get recipient email (defaults to a fallback)
-      const toEmail = Deno.env.get("CONTACT_EMAIL") || "hello@microgridfoundry.co.uk";
-      const fromEmail = Deno.env.get("RESEND_FROM_EMAIL") || "onboarding@resend.dev";
-
-      // Initialize Resend
-      const resend = new Resend(resendApiKey);
-
-      // Send email
-      const { data, error } = await resend.emails.send({
+      // Send email with additional error handling
+      let data, error;
+      try {
+        const result = await resend.emails.send({
         from: fromEmail,
         to: toEmail,
         reply_to: email,
@@ -180,7 +212,22 @@ export const handler: Handlers = {
             </div>
           </div>
         `,
-      });
+        });
+        data = result.data;
+        error = result.error;
+      } catch (sendError) {
+        console.error("Failed to send email:", sendError);
+        return new Response(
+          JSON.stringify({
+            success: false,
+            error: "Failed to send email. The email service may be temporarily unavailable. Please try again later.",
+          }),
+          {
+            status: 500,
+            headers: { "Content-Type": "application/json" },
+          }
+        );
+      }
 
       if (error) {
         console.error("Resend API error:", error);
@@ -215,10 +262,21 @@ export const handler: Handlers = {
       );
     } catch (error) {
       console.error("Error processing contact form:", error);
+
+      // Provide more specific error messages based on error type
+      let errorMessage = "An unexpected error occurred. Please try again later.";
+
+      if (error instanceof TypeError) {
+        errorMessage = "Configuration error detected. Please ensure all environment variables are properly set. Visit /debug to check your configuration.";
+      } else if (error instanceof Error) {
+        // Log the actual error for debugging but don't expose internal details to users
+        console.error("Error details:", error.message, error.stack);
+      }
+
       return new Response(
         JSON.stringify({
           success: false,
-          error: "An unexpected error occurred. Please try again later.",
+          error: errorMessage,
         }),
         {
           status: 500,
