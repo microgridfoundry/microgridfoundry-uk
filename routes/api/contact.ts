@@ -45,7 +45,13 @@ setInterval(() => {
 export const handler: Handlers = {
   async POST(req, _ctx) {
     try {
-      console.log("Contact form handler called", { hasReq: !!req, hasHeaders: !!(req?.headers), reqType: typeof req });
+      // Debug: Log what we're actually receiving
+      console.log("Contact form handler called");
+      console.log("req type:", typeof req);
+      console.log("req keys:", req ? Object.keys(req) : "null");
+      console.log("req.headers type:", typeof req?.headers);
+      console.log("Has formData method:", typeof req?.formData);
+
       // Early check for environment access
       if (typeof Deno === "undefined" || !Deno.env) {
         console.error("Deno environment not available");
@@ -62,12 +68,31 @@ export const handler: Handlers = {
       }
 
       // Check request object integrity
-      if (!req || !req.headers) {
-        console.error("Invalid request object:", { hasReq: !!req, hasHeaders: !!(req && req.headers) });
+      if (!req) {
+        console.error("No request object received");
         return new Response(
           JSON.stringify({
             success: false,
             error: "Invalid request received. Please try again.",
+          }),
+          {
+            status: 400,
+            headers: { "Content-Type": "application/json" },
+          }
+        );
+      }
+
+      // Try to access headers safely
+      let headers;
+      try {
+        headers = req.headers;
+        console.log("Successfully accessed req.headers");
+      } catch (e) {
+        console.error("Error accessing req.headers:", e);
+        return new Response(
+          JSON.stringify({
+            success: false,
+            error: "Request headers not accessible. Please try again.",
           }),
           {
             status: 400,
@@ -93,8 +118,8 @@ export const handler: Handlers = {
       }
 
       // Get client IP for rate limiting
-      const ip = req.headers.get("x-forwarded-for")?.split(",")[0].trim() ||
-        req.headers.get("x-real-ip") ||
+      const ip = headers?.get("x-forwarded-for")?.split(",")[0].trim() ||
+        headers?.get("x-real-ip") ||
         "unknown";
 
       // Check rate limit
