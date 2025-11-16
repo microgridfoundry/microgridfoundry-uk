@@ -1,8 +1,9 @@
 export const title = "Debug Page - Microgrid Foundry";
 
 import { PageProps } from "fresh";
+import { getComponentVersions } from "../lib/versions.ts";
 
-export default function DebugPage(props: PageProps) {
+export default async function DebugPage(props: PageProps) {
   // Access control: only show if ENABLE_DEBUG_PAGE is not explicitly set to "false"
   const enableDebug = Deno.env.get("ENABLE_DEBUG_PAGE");
   if (enableDebug === "false") {
@@ -25,18 +26,8 @@ export default function DebugPage(props: PageProps) {
     "TypeScript": Deno.version.typescript,
   };
 
-  // Dependencies from deno.json
-  const dependencies = {
-    "Fresh": "jsr:@fresh/core@2.1.4",
-    "Preact": "npm:preact@^10.27.0",
-    "@preact/signals": "npm:@preact/signals@^2.2.1",
-    "Tailwind CSS": "npm:tailwindcss@^4.1.10",
-    "@fresh/plugin-tailwind": "jsr:@fresh/plugin-tailwind@1.0.0",
-    "@tailwindcss/postcss": "npm:@tailwindcss/postcss@^4.1.10",
-    "PostCSS": "npm:postcss@^8.5.6",
-    "@std/dotenv": "jsr:@std/dotenv@^0.225.0",
-    "@std/http": "jsr:@std/http@^1.0.0",
-  };
+  // Dependencies from deno.json (auto-generated from deno.json imports)
+  const dependencies = await getComponentVersions();
 
   // Tailwind configuration
   const tailwindConfig = {
