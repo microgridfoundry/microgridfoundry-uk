@@ -1,6 +1,7 @@
 import { PageProps } from "fresh";
 import Nav from "../components/Nav.tsx";
 import Footer from "../components/Footer.tsx";
+import ContactForm from "../islands/ContactForm.tsx";
 
 export default function ContactPage(_props: PageProps) {
   return (
@@ -59,75 +60,7 @@ export default function ContactPage(_props: PageProps) {
                 </div>
 
                 {/* Contact Form */}
-                <div>
-                  <h3 className="text-2xl font-bold text-gray-900 mb-6">
-                    Contact us now
-                  </h3>
-                  <form className="space-y-4">
-                    <div>
-                      <input
-                        type="text"
-                        id="name"
-                        name="name"
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
-                        placeholder="Name"
-                        required
-                      />
-                    </div>
-
-                    <div>
-                      <input
-                        type="email"
-                        id="email"
-                        name="email"
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
-                        placeholder="Email"
-                        required
-                      />
-                    </div>
-
-                    <div>
-                      <textarea
-                        id="enquiry"
-                        name="enquiry"
-                        rows={6}
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition resize-none"
-                        placeholder="Enquiry"
-                        required
-                      >
-                      </textarea>
-                    </div>
-
-                    <button
-                      type="submit"
-                      className="bg-yellow-500 text-black px-8 py-3 rounded-lg font-semibold hover:bg-yellow-600 transition duration-200"
-                    >
-                      Send
-                    </button>
-
-                    <p className="text-xs text-gray-500 mt-4">
-                      This site is protected by reCAPTCHA and the Google{" "}
-                      <a
-                        href="https://policies.google.com/privacy"
-                        className="text-blue-600 hover:underline"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                      >
-                        Privacy Policy
-                      </a>{" "}
-                      and{" "}
-                      <a
-                        href="https://policies.google.com/terms"
-                        className="text-blue-600 hover:underline"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                      >
-                        Terms of Service
-                      </a>{" "}
-                      apply.
-                    </p>
-                  </form>
-                </div>
+                <ContactForm />
               </div>
             </div>
           </div>
