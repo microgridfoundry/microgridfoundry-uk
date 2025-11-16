@@ -60,6 +60,21 @@ export const handler: Handlers = {
         );
       }
 
+      // Check request object integrity
+      if (!req || !req.headers) {
+        console.error("Invalid request object:", { hasReq: !!req, hasHeaders: !!(req && req.headers) });
+        return new Response(
+          JSON.stringify({
+            success: false,
+            error: "Invalid request received. Please try again.",
+          }),
+          {
+            status: 400,
+            headers: { "Content-Type": "application/json" },
+          }
+        );
+      }
+
       // Check for Resend API key early
       const resendApiKey = Deno.env.get("RESEND_API_KEY");
       if (!resendApiKey || resendApiKey.trim() === "") {
