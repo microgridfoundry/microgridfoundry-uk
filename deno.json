@@ -39,11 +39,19 @@
     "jsxImportSource": "preact",
     "jsxPrecompileSkipElements": [
       "a",
-      "img", 
+      "img",
       "source",
       "body",
       "html",
-      "head"
+      "head",
+      "title",
+      "meta",
+      "script",
+      "link",
+      "style",
+      "base",
+      "noscript",
+      "template"
     ]
   }
 }
