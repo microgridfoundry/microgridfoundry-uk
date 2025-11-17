@@ -48,6 +48,13 @@ export default async function DebugPage(props: PageProps) {
     "CI": Deno.env.get("CI") || "not set",
   };
 
+  // Email service configuration (securely masked)
+  const emailConfig = {
+    "RESEND_API_KEY": Deno.env.get("RESEND_API_KEY") ? "✓ Set (hidden)" : "✗ Not set",
+    "RESEND_FROM_EMAIL": Deno.env.get("RESEND_FROM_EMAIL") || "not set (will use default: onboarding@resend.dev)",
+    "CONTACT_EMAIL": Deno.env.get("CONTACT_EMAIL") || "not set (will use default: hello@microgridfoundry.co.uk)",
+  };
+
   // All environment variables (masked for security)
   const allEnvVars: Record<string, string> = {};
   for (const [key, value] of Object.entries(Deno.env.toObject())) {
@@ -222,6 +229,61 @@ export default async function DebugPage(props: PageProps) {
               </tbody>
             </table>
           </div>
+        </section>
+
+        {/* Email Service Configuration Section */}
+        <section class="mb-8">
+          <h2 class="text-2xl font-bold text-gray-900 mb-4">
+            Email Service Configuration
+            <span class="text-sm font-normal text-gray-600 ml-2">
+              (for contact form)
+            </span>
+          </h2>
+          <div class="bg-white rounded-lg shadow-md border border-slate-200 overflow-hidden">
+            <table class="w-full">
+              <thead class="bg-slate-100 border-b border-slate-200">
+                <tr>
+                  <th class="py-3 px-4 text-left font-semibold text-gray-700 text-sm w-1/3">
+                    Variable
+                  </th>
+                  <th class="py-3 px-4 text-left font-semibold text-gray-700 text-sm">
+                    Status
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                {Object.entries(emailConfig).map(([key, value], idx) => (
+                  <tr class={idx % 2 === 0 ? "bg-white" : "bg-slate-50"}>
+                    <td class="py-3 px-4 font-mono text-xs text-gray-700 break-all">
+                      {key}
+                    </td>
+                    <td class="py-3 px-4 font-mono text-xs text-gray-600 break-all">
+                      {value}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          {!Deno.env.get("RESEND_API_KEY") && (
+            <div class="mt-4 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+              <div class="flex items-start">
+                <span class="text-yellow-600 text-xl mr-2">⚠</span>
+                <div class="flex-1">
+                  <p class="font-semibold text-yellow-800 mb-1">
+                    Email service not configured
+                  </p>
+                  <p class="text-sm text-yellow-700">
+                    To enable the contact form, set the <code class="bg-yellow-100 px-1 py-0.5 rounded">RESEND_API_KEY</code> environment variable.
+                    Get your API key from{" "}
+                    <a href="https://resend.com" target="_blank" rel="noopener noreferrer" class="underline hover:text-yellow-900">
+                      resend.com
+                    </a>.
+                  </p>
+                </div>
+              </div>
+            </div>
+          )}
         </section>
 
         {/* All Environment Variables Section */}
