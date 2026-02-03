@@ -83,7 +83,7 @@ export default function Communities() {
           <div className="bg-white rounded-2xl shadow-lg overflow-hidden">
             <div className="aspect-w-2 aspect-h-1 bg-gray-200">
               <img
-                src="https://cepro.energy/wp-content/uploads/2024/11/Developer-Hero-IMG-2.jpg.webp"
+                src="/hazelmead-people.jpg"
                 alt="Hazelmead Development - Community housing with solar panels"
                 className="w-full h-64 object-cover"
               />
